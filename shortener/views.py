@@ -4,11 +4,10 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.db.models import Count
 from django.core.cache import cache
-from django.shortcuts import redirect, render
 
 from user_agents import parse
 
@@ -20,30 +19,45 @@ import hashlib
 import logging
 import time
 
+
 logger = logging.getLogger("shortener")
 
+
+# Create and list URLs
 class URLCreateView(APIView):
     permission_classes = [IsAuthenticated]
-    
-    def get(self, request):
-       urls = URL.objects.filter(user=request.user).order_by("-created_at")
-       paginator = PageNumberPagination()
-       paginator.page_size = 10
-        
-       page = paginator.paginate_queryset(urls, request)
-       serializer = URLSerializer(page, many=True)
 
-       return paginator.get_paginated_response(serializer.data)
+    def get(self, request):
+        urls = URL.objects.filter(
+            user=request.user
+        ).order_by("-created_at")
+
+        paginator = PageNumberPagination()
+        paginator.page_size = 10
+
+        page = paginator.paginate_queryset(urls, request)
+        serializer = URLSerializer(page, many=True)
+
+        return paginator.get_paginated_response(serializer.data)
 
     def post(self, request):
         serializer = URLSerializer(data=request.data)
 
         if serializer.is_valid():
             url = serializer.save(user=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED
+            )
 
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+# Get, update and delete a URL
 class URLDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -63,6 +77,7 @@ class URLDetailView(APIView):
             )
 
         serializer = URLSerializer(url)
+
         return Response(serializer.data)
 
     def put(self, request, id):
@@ -119,8 +134,11 @@ class URLDetailView(APIView):
             {"detail": "URL deleted successfully."},
             status=status.HTTP_204_NO_CONTENT
         )
-        
+
+
+# Show URL analytics
 class URLAnalyticsView(APIView):
+
     def get(self, request, id):
         try:
             url = URL.objects.get(id=id)
@@ -131,6 +149,7 @@ class URLAnalyticsView(APIView):
             )
 
         total_clicks = ClickEvent.objects.filter(url=url).count()
+
         update_analytics.delay(url.id)
 
         clicks_over_time = (
@@ -172,10 +191,7 @@ class URLAnalyticsView(APIView):
             .annotate(clicks=Count("id"))
             .order_by("-clicks")
         )
-        
-        
 
-   
         return Response({
             "url_id": url.id,
             "short_code": url.short_code,
@@ -186,10 +202,12 @@ class URLAnalyticsView(APIView):
             "devices": devices,
             "browsers": browsers
         })
-        
-class URLRedirectView(APIView):
-    def get(self, request, short_code):
 
+
+# Redirect short URL to original URL
+class URLRedirectView(APIView):
+
+    def get(self, request, short_code):
         start_time = time.time()
 
         cache_key = f"url:{short_code}"
@@ -201,10 +219,12 @@ class URLRedirectView(APIView):
                 url = URL.objects.get(id=url_id)
             except URL.DoesNotExist:
                 cache.delete(cache_key)
+
                 return Response(
                     {"detail": "URL not found."},
                     status=status.HTTP_404_NOT_FOUND
                 )
+
         else:
             try:
                 url = URL.objects.get(short_code=short_code)
@@ -214,7 +234,11 @@ class URLRedirectView(APIView):
                     status=status.HTTP_404_NOT_FOUND
                 )
 
-            cache.set(cache_key, url.id, timeout=3600)
+            cache.set(
+                cache_key,
+                url.id,
+                timeout=3600
+            )
 
         if not url.status:
             return Response(
@@ -228,7 +252,9 @@ class URLRedirectView(APIView):
                 status=status.HTTP_410_GONE
             )
 
-        user_agent = parse(request.META.get("HTTP_USER_AGENT", ""))
+        user_agent = parse(
+            request.META.get("HTTP_USER_AGENT", "")
+        )
 
         ClickEvent.objects.create(
             url=url,
@@ -249,8 +275,12 @@ class URLRedirectView(APIView):
         )
 
         return redirect(url.original_url)
-    
-    
 
+
+# Home page
 def home(request):
-    return render(request, "shortener/index.html")
+    return render(
+        request,
+        "shortener/index.html"
+    )
+

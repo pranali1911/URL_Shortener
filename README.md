@@ -421,7 +421,7 @@ Django Admin is used to manage application data.
 
 Open:
 
-```text
+'''text
 http://127.0.0.1:8000/admin/
 ```
 
@@ -431,7 +431,43 @@ The admin panel provides management for:
 * Click events
 * Analytics
 
----
+
+
+## Application URLs
+
+Homepage / Frontend
+
+http://127.0.0.1:8000/
+
+Login
+
+http://127.0.0.1:8000/api-auth/login/
+
+API — My URLs
+
+http://127.0.0.1:8000/api/urls
+
+API — URL Details
+
+http://127.0.0.1:8000/api/urls/{id}
+
+API — Analytics
+
+http://127.0.0.1:8000/api/urls/{id}/analytics
+
+Short URL Redirect
+
+http://127.0.0.1:8000/{short_code}
+
+Example:
+
+http://127.0.0.1:8000/rtmnu
+http://127.0.0.1:8000/whatsapp
+http://127.0.0.1:8000/6
+
+Django Admin
+
+http://127.0.0.1:8000/admin/
 
 ## Installation
 
