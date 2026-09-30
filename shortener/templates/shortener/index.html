@@ -1,0 +1,171 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>URL Shortener</title>
+
+    <link rel="stylesheet" href="{% static 'shortener/style.css' %}">
+</head>
+
+<body>
+
+    <div class="layout">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+
+            <div class="logo">
+                <div class="logo-icon">U</div>
+                <div>
+                    <h2>Shortly</h2>
+                    <span>URL Shortener</span>
+                </div>
+            </div>
+
+            <nav>
+
+                <a href="#" class="nav-item active">
+                    <span>⌂</span>
+                    Dashboard
+                </a>
+
+                <a href="#myUrls" class="nav-item">
+                    <span>🔗</span>
+                    My URLs
+                </a>
+
+                <a href="#createUrl" class="nav-item">
+                    <span>＋</span>
+                    Create URL
+                </a>
+
+            </nav>
+
+            <div class="sidebar-bottom">
+                <div class="user-box">
+                    <div class="user-avatar">P</div>
+                    <div>
+                        <strong>pranali</strong>
+                        <small>Logged in</small>
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <header class="topbar">
+                <div>
+                    <h1>Welcome back, Pranali 👋</h1>
+                    <p>Create and manage your short links easily.</p>
+                </div>
+            </header>
+
+
+            <!-- Create URL -->
+            <section class="create-card" id="createUrl">
+
+                <div class="card-heading">
+                    <div>
+                        <h2>Create Short URL</h2>
+                        <p>Turn a long URL into a simple shareable link.</p>
+                    </div>
+
+                    <div class="link-icon">🔗</div>
+                </div>
+
+                <form id="urlForm">
+
+                    <div class="form-group">
+
+                        <label>Original URL</label>
+
+                        <input
+                            type="url"
+                            id="original_url"
+                            placeholder="https://example.com/your-long-url"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-row">
+
+                        <div class="form-group">
+
+                            <label>Custom Alias</label>
+
+                            <input
+                                type="text"
+                                id="custom_alias"
+                                placeholder="my-link"
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label>Expiry Date</label>
+
+                            <input
+                                type="datetime-local"
+                                id="expires_at"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <button type="submit" class="create-button">
+                        Shorten URL
+                    </button>
+
+                </form>
+
+                <p id="message"></p>
+
+            </section>
+
+
+            <!-- My URLs -->
+            <section class="urls-section" id="myUrls">
+
+                <div class="section-heading">
+
+                    <div>
+                        <h2>My URLs</h2>
+                        <p>Your recently created short links</p>
+                    </div>
+
+                    <span class="url-count" id="urlCount">0 Links</span>
+
+                </div>
+
+
+                <div id="urlList">
+                    <div class="loading">Loading URLs...</div>
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <script src="{% static 'shortener/script.js' %}"></script>
+
+</body>
+
+</html>
+
